@@ -7,9 +7,8 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Argument
 {
-    public function __construct(
-        public readonly ?int $position = null,
-    ) {
+    public function __construct()
+    {
         //
     }
 }

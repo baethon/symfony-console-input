@@ -1,5 +1,6 @@
 <?php
 
+use Baethon\Symfony\Console\Input\Attributes\DefaultValue;
 use Baethon\Symfony\Console\Input\Attributes\Description;
 use Baethon\Symfony\Console\Input\Attributes\Name;
 use Baethon\Symfony\Console\Input\Attributes\Shortcut;
@@ -75,6 +76,29 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
             name: 'test',
             required: true,
             list: true,
+        ),
+    ],
+    'as option' => [
+        new class
+        {
+            public bool $test;
+        },
+        new ParameterDefinition(
+            name: 'test',
+            required: true,
+            option: true,
+        ),
+    ],
+    'default value' => [
+        new class
+        {
+            #[DefaultValue('Test')]
+            public string $test;
+        },
+        new ParameterDefinition(
+            name: 'test',
+            required: false,
+            defaultValue: 'Test',
         ),
     ],
 ]);
