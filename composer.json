@@ -7,15 +7,20 @@
     },
     "require-dev": {
         "laravel/pint": "^1.18",
-        "pestphp/pest": "^3.2"
+        "pestphp/pest": "^3.2",
+        "symfony/var-dumper": "^7.1"
     },
-    "license": "MIT",
     "authors": [
         {
             "name": "Radoslaw Mejer",
             "email": "radmen@baethon.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Baethon\\Symfony\\Console\\Input\\": "src/"
+        }
+    },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
