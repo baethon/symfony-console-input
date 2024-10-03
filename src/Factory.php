@@ -2,9 +2,11 @@
 
 namespace Baethon\Symfony\Console\Input;
 
+use Baethon\Symfony\Console\Input\Attributes\Argument;
 use Baethon\Symfony\Console\Input\Attributes\Option;
 use ReflectionClass;
 use ReflectionProperty;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 final class Factory
@@ -45,17 +47,47 @@ final class Factory
 
     public function createArguments(object|string $inputDto): array
     {
-        return [];
+        $reflection = new ReflectionClass($inputDto);
+
+        return array_map(
+            function (ParameterDefinition $parameter) {
+                $mode = 0;
+
+                if ($parameter->required) {
+                    $mode |= InputArgument::REQUIRED;
+                } else {
+                    $mode |= InputArgument::OPTIONAL;
+                }
+
+                if ($parameter->list) {
+                    $mode |= InputArgument::IS_ARRAY;
+                }
+
+                return new InputArgument(
+                    $parameter->name,
+                    mode: $mode,
+                    description: $parameter->description ?? '',
+                    default: $parameter->defaultValue,
+                );
+            },
+            $this->collectByType($reflection, Argument::class),
+        );
     }
 
     /**
+     * @param  class-string  $attribute
      * @return ParameterDefinition[]
      */
     private function collectByType(ReflectionClass $reflection, string $attribute): array
     {
+        $properties = array_filter(
+            $reflection->getProperties(ReflectionProperty::IS_PUBLIC),
+            fn (ReflectionProperty $item) => $item->getAttributes($attribute) !== [],
+        );
+
         return array_map(
             ParameterDefinition::fromReflectionProperty(...),
-            $reflection->getProperties(ReflectionProperty::IS_PUBLIC),
+            $properties,
         );
     }
 }
