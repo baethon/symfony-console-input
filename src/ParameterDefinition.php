@@ -2,7 +2,6 @@
 
 namespace Baethon\Symfony\Console\Input;
 
-use Baethon\Symfony\Console\Input\Attributes\DefaultValue;
 use Baethon\Symfony\Console\Input\Attributes\Description;
 use Baethon\Symfony\Console\Input\Attributes\Name;
 use Baethon\Symfony\Console\Input\Attributes\Shortcut;
@@ -26,8 +25,7 @@ final class ParameterDefinition
     public static function fromReflectionProperty(ReflectionProperty $property): ParameterDefinition
     {
         $type = $property->getType();
-        $defaultValue = self::findAttribute($property, DefaultValue::class)
-            ?->value;
+        $defaultValue = $property->getDefaultValue();
 
         return new self(
             name: self::findAttribute($property, Name::class)

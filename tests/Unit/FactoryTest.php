@@ -1,7 +1,6 @@
 <?php
 
 use Baethon\Symfony\Console\Input\Attributes\Argument;
-use Baethon\Symfony\Console\Input\Attributes\DefaultValue;
 use Baethon\Symfony\Console\Input\Attributes\Description;
 use Baethon\Symfony\Console\Input\Attributes\Option;
 use Baethon\Symfony\Console\Input\Attributes\Shortcut;
@@ -116,8 +115,7 @@ describe('InputOption', function () {
             new class
             {
                 #[Option]
-                #[DefaultValue('Lorem ipsum')]
-                public string $test;
+                public string $test = 'Lorem ipsum';
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_OPTIONAL, default: 'Lorem ipsum'),
@@ -223,8 +221,7 @@ define('InputArgument', function () {
             new class
             {
                 #[Argument]
-                #[DefaultValue('Lorem ipsum')]
-                public string $test;
+                public string $test = 'Lorem ipsum';
             },
             [
                 new InputArgument('test', mode: InputArgument::OPTIONAL, default: 'Lorem ipsum'),

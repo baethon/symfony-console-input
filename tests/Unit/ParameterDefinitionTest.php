@@ -1,6 +1,5 @@
 <?php
 
-use Baethon\Symfony\Console\Input\Attributes\DefaultValue;
 use Baethon\Symfony\Console\Input\Attributes\Description;
 use Baethon\Symfony\Console\Input\Attributes\Name;
 use Baethon\Symfony\Console\Input\Attributes\Shortcut;
@@ -92,8 +91,7 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
     'default value' => [
         new class
         {
-            #[DefaultValue('Test')]
-            public string $test;
+            public string $test = 'Test';
         },
         new ParameterDefinition(
             name: 'test',
