@@ -3,6 +3,8 @@
 namespace Baethon\Symfony\Console\Input;
 
 use Baethon\Symfony\Console\Input\Attributes\InputData;
+use ReflectionIntersectionType;
+use ReflectionNamedType;
 use ReflectionObject;
 use ReflectionProperty;
 use ReflectionUnionType;
@@ -61,22 +63,12 @@ trait UsesInputData
         foreach ($inputData as $item) {
             $type = $item->getType();
 
-            if (! $type instanceof ReflectionUnionType) {
-                throw new \UnexpectedValueException(sprintf('InputData for property $%s needs to be a union type', $item->getName()));
+            if (! $type) {
+                throw new \UnexpectedValueException(sprintf('InputData fro property $%x needs to be typed', $item->getName()));
             }
 
-            $subtypes = $type->getTypes();
-
-            if (count($subtypes) !== 2) {
-                throw new \UnexpectedValueException(sprintf('The union type for property $%s should have exactly two types', $reflection->getName()));
-            }
-
-            $hasProxy = array_filter($subtypes, function ($reflection) {
-                return ($reflection instanceof \ReflectionNamedType) && $reflection->getName() === DataProxy::class;
-            }) !== [];
-
-            if (! $hasProxy) {
-                throw new \UnexpectedValueException(sprintf('Property $%s needs to be a union type with DataProxy', $item->getName()));
+            if ($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType) {
+                throw new \UnexpectedValueException(sprintf("InputData for property $%s can't be a union type or intersection", $item->getName()));
             }
         }
 
@@ -94,25 +86,19 @@ trait UsesInputData
     final protected function initializeInputData(InputInterface $input): void
     {
         $properties = $this->findInputData();
+        $proxyFactory = new ProxyFactory;
 
         foreach ($properties as $item) {
             $dtoClass = $this->extractDtoClass($item->getType());
-            $item->setValue($this, new DataProxy($dtoClass, $input));
+            $item->setValue($this, $proxyFactory->create($dtoClass, $input));
         }
     }
 
     /**
      * @return class-string
      */
-    private function extractDtoClass(\ReflectionUnionType $type): string
+    private function extractDtoClass(ReflectionNamedType $type): string
     {
-        $dtoType = array_filter(
-            $type->getTypes(),
-            fn (\ReflectionNamedType $type) => $type->getName() !== DataProxy::class
-        );
-
-        $dtoClass = current($dtoType);
-
-        return $dtoClass->getName();
+        return $type->getName();
     }
 }

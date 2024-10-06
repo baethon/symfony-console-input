@@ -1,11 +1,11 @@
 <?php
 
 use Baethon\Symfony\Console\Input\Attributes\InputData;
-use Baethon\Symfony\Console\Input\DataProxy;
 use Baethon\Symfony\Console\Input\UsesInputData;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\Stubs\InputDataDto;
@@ -17,7 +17,7 @@ describe('configure()', function () {
             use UsesInputData;
 
             #[InputData]
-            private InputDataDto|DataProxy $input;
+            private InputDataDto $input;
         };
 
         expect($command->getDefinition()->getArguments())->toEqual([
@@ -35,33 +35,13 @@ describe('configure()', function () {
         ]);
     });
 
-    it('throws exception when InputData is without proxy', function () {
+    it('throws exception when InputData is union type', function () {
         new class extends Command
         {
             use UsesInputData;
 
             #[InputData]
-            private InputDataDto $input;
-        };
-    })->throws(\UnexpectedValueException::class);
-
-    it('throws exception when InputData is just proxy', function () {
-        new class extends Command
-        {
-            use UsesInputData;
-
-            #[InputData]
-            private DataProxy $input;
-        };
-    })->throws(\UnexpectedValueException::class);
-
-    it('throws exception when InputData has three union types', function () {
-        new class extends Command
-        {
-            use UsesInputData;
-
-            #[InputData]
-            private InputDataDto|DataProxy|\stdClass $input;
+            private InputDataDto|\stdClass $input;
         };
     })->throws(\UnexpectedValueException::class);
 
@@ -83,13 +63,23 @@ describe('initialize()', function () {
             use UsesInputData;
 
             #[InputData]
-            public InputDataDto|DataProxy $inputData;
+            public InputDataDto $inputData;
         };
 
-        $input = new ArrayInput([]);
+        $input = new ArrayInput([
+            '--age' => 25,
+            'name' => 'Jon',
+        ], new InputDefinition([
+            new InputArgument('name', mode: InputArgument::REQUIRED),
+            new InputOption('age', mode: InputOption::VALUE_OPTIONAL),
+        ]));
 
         (fn () => $this->initialize($input, new NullOutput))->call($command);
 
-        expect($command->inputData)->toEqual(new DataProxy(InputDataDto::class, $input));
+        dd($command->inputData->age);
+
+        expect($command->inputData)->toBeInstanceOf(InputDataDto::class);
+        expect($command->inputData->name)->toEqual('Jon');
+        expect($command->inputData->age)->toEqual(25);
     });
 });
