@@ -3,6 +3,7 @@
     "description": "Generates command signature based on an input DTO",
     "type": "library",
     "require": {
+        "php": ">=8.4",
         "symfony/console": "^7.1",
         "ocramius/proxy-manager": "^1.0"
     },
