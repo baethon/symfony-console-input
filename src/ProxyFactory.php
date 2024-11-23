@@ -3,6 +3,7 @@
 namespace Baethon\Symfony\Console\Input;
 
 use Baethon\Symfony\Console\Input\Attributes\Argument;
+use Baethon\Symfony\Console\Input\Attributes\Name;
 use Baethon\Symfony\Console\Input\Attributes\Option;
 use ReflectionClass;
 use ReflectionProperty;
@@ -43,12 +44,17 @@ class ProxyFactory
     private function getPropertyData(ReflectionProperty $item, InputInterface $input): array
     {
         $option = $item->getAttributes(Option::class)[0] ?? null;
-        $name = $item->getName();
+        $propertyName = $item->getName();
+        $name = $item->getAttributes(Name::class)[0] ?? null;
+
+        $name = $name
+            ? $name->newInstance()->name
+            : $propertyName;
 
         if ($option) {
-            return [$name, $input->getOption($name)];
+            return [$propertyName, $input->getOption($name)];
         }
 
-        return [$name, $input->getArgument($name)];
+        return [$propertyName, $input->getArgument($name)];
     }
 }

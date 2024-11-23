@@ -1,5 +1,7 @@
 <?php
 
+use Baethon\Symfony\Console\Input\Attributes\Argument;
+use Baethon\Symfony\Console\Input\Attributes\Name;
 use Baethon\Symfony\Console\Input\ProxyFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,5 +22,27 @@ it('creates DTO ghost instance', function () {
     $ghost = $factory->create(InputDataDto::class, $input);
 
     expect($ghost->age)->toEqual(25);
+    expect($ghost->name)->toEqual('Jon');
+});
+
+it('supports name attribute', function () {
+    $factory = new ProxyFactory;
+    $input = new ArrayInput([
+        'foo' => 'Jon',
+    ], new InputDefinition([
+        new InputArgument('foo', mode: InputArgument::REQUIRED),
+    ]));
+
+    $dto = new class
+    {
+        public function __construct(
+            #[Argument]
+            #[Name('foo')]
+            public ?string $name = null
+        ) {}
+    };
+
+    $ghost = $factory->create($dto::class, $input);
+
     expect($ghost->name)->toEqual('Jon');
 });
