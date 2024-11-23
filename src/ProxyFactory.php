@@ -28,19 +28,19 @@ class ProxyFactory
 
         $reflection = new ReflectionClass($targetDto);
 
-        return $reflection->newLazyGhost(function ($ghost) use ($attributes, $input) {
+        return $reflection->newLazyProxy(function () use ($attributes, $input, $targetDto) {
             $properties = [];
 
             foreach ($attributes as $item) {
-                [$key, $value] = $this->setProperty($item, $input);
+                [$key, $value] = $this->getPropertyData($item, $input);
                 $properties[$key] = $value;
             }
 
-            $ghost->__construct(...$properties);
+            return new $targetDto(...$properties);
         });
     }
 
-    private function setProperty(ReflectionProperty $item, InputInterface $input): array
+    private function getPropertyData(ReflectionProperty $item, InputInterface $input): array
     {
         $option = $item->getAttributes(Option::class)[0] ?? null;
         $name = $item->getName();
