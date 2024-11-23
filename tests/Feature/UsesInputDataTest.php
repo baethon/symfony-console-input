@@ -76,8 +76,6 @@ describe('initialize()', function () {
 
         (fn () => $this->initialize($input, new NullOutput))->call($command);
 
-        dd($command->inputData->age);
-
         expect($command->inputData)->toBeInstanceOf(InputDataDto::class);
         expect($command->inputData->name)->toEqual('Jon');
         expect($command->inputData->age)->toEqual(25);
