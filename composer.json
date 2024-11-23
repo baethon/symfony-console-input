@@ -2,6 +2,7 @@
     "name": "baethon/symfony-console-input",
     "description": "Generates command signature based on an input DTO",
     "type": "library",
+    "license": "MIT",
     "require": {
         "php": ">=8.4",
         "symfony/console": "^7.1"
