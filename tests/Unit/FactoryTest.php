@@ -14,10 +14,12 @@ describe('InputOption', function () {
         expect($actual)->toEqual($expected);
     })->with([
         'boolean flag' => [
-            new class
+            new class(true)
             {
-                #[Option]
-                public bool $test;
+                public function __construct(
+                    #[Option]
+                    public bool $test,
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_NONE),
@@ -25,10 +27,12 @@ describe('InputOption', function () {
         ],
 
         'string required option' => [
-            new class
+            new class('')
             {
-                #[Option]
-                public string $test;
+                public function __construct(
+                    #[Option]
+                    public string $test,
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_REQUIRED),
@@ -36,10 +40,12 @@ describe('InputOption', function () {
         ],
 
         'string option' => [
-            new class
+            new class('')
             {
-                #[Option]
-                public ?string $test;
+                public function __construct(
+                    #[Option]
+                    public ?string $test,
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_OPTIONAL),
@@ -47,10 +53,12 @@ describe('InputOption', function () {
         ],
 
         'array required option' => [
-            new class
+            new class([])
             {
-                #[Option]
-                public array $test;
+                public function __construct(
+                    #[Option]
+                    public array $test,
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY),
@@ -58,10 +66,12 @@ describe('InputOption', function () {
         ],
 
         'array option' => [
-            new class
+            new class([])
             {
-                #[Option]
-                public ?array $test;
+                public function __construct(
+                    #[Option]
+                    public ?array $test,
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY),
@@ -69,11 +79,13 @@ describe('InputOption', function () {
         ],
 
         'shortcut' => [
-            new class
+            new class(true)
             {
-                #[Option]
-                #[Shortcut('t')]
-                public bool $test;
+                public function __construct(
+                    #[Option]
+                    #[Shortcut('t')]
+                    public bool $test,
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_NONE, shortcut: 't'),
@@ -81,11 +93,13 @@ describe('InputOption', function () {
         ],
 
         'description' => [
-            new class
+            new class(true)
             {
-                #[Option]
-                #[Description('Lorem ipsum')]
-                public bool $test;
+                public function __construct(
+                    #[Option]
+                    #[Description('Lorem ipsum')]
+                    public bool $test,
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_NONE, description: 'Lorem ipsum'),
@@ -93,16 +107,18 @@ describe('InputOption', function () {
         ],
 
         'multiple options' => [
-            new class
+            new class(true, '', [])
             {
-                #[Option]
-                public bool $test;
+                public function __construct(
+                    #[Option]
+                    public bool $test,
 
-                #[Option]
-                public ?string $name;
+                    #[Option]
+                    public ?string $name,
 
-                #[Option]
-                public array $roles;
+                    #[Option]
+                    public array $roles,
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_NONE),
@@ -112,10 +128,12 @@ describe('InputOption', function () {
         ],
 
         'default value' => [
-            new class
+            new class('')
             {
-                #[Option]
-                public string $test = 'Lorem ipsum';
+                public function __construct(
+                    #[Option]
+                    public string $test = 'Lorem ipsum',
+                ) {}
             },
             [
                 new InputOption('test', mode: InputOption::VALUE_OPTIONAL, default: 'Lorem ipsum'),
@@ -124,12 +142,14 @@ describe('InputOption', function () {
     ]);
 
     it('doesnt pick non-options', function () {
-        $inputDto = new class
+        $inputDto = new class('', '')
         {
-            #[Argument]
-            public string $test;
+            public function __construct(
+                #[Argument]
+                public string $test,
 
-            public string $foo;
+                public string $foo,
+            ) {}
         };
 
         $actual = (new Factory)->createOptions($inputDto);
@@ -137,16 +157,18 @@ describe('InputOption', function () {
     });
 });
 
-define('InputArgument', function () {
+describe('InputArgument', function () {
     it('creates list of arguments', function ($inputDto, array $expected) {
         $actual = (new Factory)->createArguments($inputDto);
         expect($actual)->toEqual($expected);
     })->with([
         'string required option' => [
-            new class
+            new class('')
             {
-                #[Argument]
-                public string $test;
+                public function __construct(
+                    #[Argument]
+                    public string $test,
+                ) {}
             },
             [
                 new InputArgument('test', mode: InputArgument::REQUIRED),
@@ -154,10 +176,12 @@ define('InputArgument', function () {
         ],
 
         'string option' => [
-            new class
+            new class('')
             {
-                #[Argument]
-                public ?string $test;
+                public function __construct(
+                    #[Argument]
+                    public ?string $test,
+                ) {}
             },
             [
                 new InputArgument('test', mode: InputArgument::OPTIONAL),
@@ -165,10 +189,12 @@ define('InputArgument', function () {
         ],
 
         'array required option' => [
-            new class
+            new class([])
             {
-                #[Argument]
-                public array $test;
+                public function __construct(
+                    #[Argument]
+                    public array $test,
+                ) {}
             },
             [
                 new InputArgument('test', mode: InputArgument::REQUIRED | InputArgument::IS_ARRAY),
@@ -176,10 +202,12 @@ define('InputArgument', function () {
         ],
 
         'array option' => [
-            new class
+            new class([])
             {
-                #[Argument]
-                public ?array $test;
+                public function __construct(
+                    #[Argument]
+                    public ?array $test,
+                ) {}
             },
             [
                 new InputArgument('test', mode: InputArgument::OPTIONAL | InputArgument::IS_ARRAY),
@@ -187,11 +215,13 @@ define('InputArgument', function () {
         ],
 
         'description' => [
-            new class
+            new class('')
             {
-                #[Argument]
-                #[Description('Lorem ipsum')]
-                public string $test;
+                public function __construct(
+                    #[Argument]
+                    #[Description('Lorem ipsum')]
+                    public string $test,
+                ) {}
             },
             [
                 new InputArgument('test', mode: InputArgument::REQUIRED, description: 'Lorem ipsum'),
@@ -199,16 +229,18 @@ define('InputArgument', function () {
         ],
 
         'multiple options' => [
-            new class
+            new class('', '', [])
             {
-                #[Argument]
-                public string $test;
+                public function __construct(
+                    #[Argument]
+                    public string $test,
 
-                #[Argument]
-                public ?string $name;
+                    #[Argument]
+                    public ?string $name,
 
-                #[Argument]
-                public array $roles;
+                    #[Argument]
+                    public array $roles,
+                ) {}
             },
             [
                 new InputArgument('test', mode: InputArgument::REQUIRED),
@@ -218,10 +250,12 @@ define('InputArgument', function () {
         ],
 
         'default value' => [
-            new class
+            new class('')
             {
-                #[Argument]
-                public string $test = 'Lorem ipsum';
+                public function __construct(
+                    #[Argument]
+                    public string $test = 'Lorem ipsum',
+                ) {}
             },
             [
                 new InputArgument('test', mode: InputArgument::OPTIONAL, default: 'Lorem ipsum'),
@@ -230,12 +264,14 @@ define('InputArgument', function () {
     ]);
 
     it('doesnt pick non-arguments', function () {
-        $inputDto = new class
+        $inputDto = new class('', '')
         {
-            #[Option]
-            public string $test;
+            public function __construct(
+                #[Option]
+                public string $test,
 
-            public string $bar;
+                public string $bar,
+            ) {}
         };
 
         $actual = (new Factory)->createArguments($inputDto);

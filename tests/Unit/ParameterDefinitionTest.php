@@ -6,15 +6,21 @@ use Baethon\Symfony\Console\Input\Attributes\Shortcut;
 use Baethon\Symfony\Console\Input\ParameterDefinition;
 
 it('extracts definition using attributes', function ($dto, ParameterDefinition $expected, string $property = 'test') {
-    $property = (new ReflectionClass($dto))->getProperty($property);
+    $constructor = (new ReflectionClass($dto))->getConstructor();
+    $parameter = array_find(
+        $constructor->getParameters(),
+        fn (ReflectionParameter $item) => $item->getName() === $property
+    );
 
-    expect(ParameterDefinition::fromReflectionProperty($property))
+    expect(ParameterDefinition::fromReflectionParameter($parameter))
         ->toEqual($expected);
 })->with([
     'required value' => [
-        new class
+        new class('')
         {
-            public string $test;
+            public function __construct(
+                public string $test,
+            ) {}
         },
         new ParameterDefinition(
             name: 'test',
@@ -22,9 +28,11 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
         ),
     ],
     'optional value' => [
-        new class
+        new class(null)
         {
-            public ?string $test;
+            public function __construct(
+                public ?string $test,
+            ) {}
         },
         new ParameterDefinition(
             name: 'test',
@@ -32,10 +40,12 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
         ),
     ],
     'with description' => [
-        new class
+        new class('')
         {
-            #[Description('Foo')]
-            public string $test;
+            public function __construct(
+                #[Description('Foo')]
+                public string $test,
+            ) {}
         },
         new ParameterDefinition(
             name: 'test',
@@ -44,10 +54,12 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
         ),
     ],
     'with shortcut' => [
-        new class
+        new class('')
         {
-            #[Shortcut('f')]
-            public string $test;
+            public function __construct(
+                #[Shortcut('f')]
+                public string $test,
+            ) {}
         },
         new ParameterDefinition(
             name: 'test',
@@ -56,10 +68,12 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
         ),
     ],
     'with name' => [
-        new class
+        new class('')
         {
-            #[Name('foo')]
-            public string $test;
+            public function __construct(
+                #[Name('foo')]
+                public string $test,
+            ) {}
         },
         new ParameterDefinition(
             name: 'foo',
@@ -67,9 +81,11 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
         ),
     ],
     'as array' => [
-        new class
+        new class([])
         {
-            public array $test;
+            public function __construct(
+                public array $test,
+            ) {}
         },
         new ParameterDefinition(
             name: 'test',
@@ -78,9 +94,11 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
         ),
     ],
     'as option' => [
-        new class
+        new class(true)
         {
-            public bool $test;
+            public function __construct(
+                public bool $test,
+            ) {}
         },
         new ParameterDefinition(
             name: 'test',
@@ -91,7 +109,9 @@ it('extracts definition using attributes', function ($dto, ParameterDefinition $
     'default value' => [
         new class
         {
-            public string $test = 'Test';
+            public function __construct(
+                public string $test = 'Test',
+            ) {}
         },
         new ParameterDefinition(
             name: 'test',

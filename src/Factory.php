@@ -5,7 +5,7 @@ namespace Baethon\Symfony\Console\Input;
 use Baethon\Symfony\Console\Input\Attributes\Argument;
 use Baethon\Symfony\Console\Input\Attributes\Option;
 use ReflectionClass;
-use ReflectionProperty;
+use ReflectionParameter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -80,13 +80,16 @@ final class Factory
      */
     private function collectByType(ReflectionClass $reflection, string $attribute): array
     {
+        $constructor = $reflection->getConstructor()
+            ?? throw new \InvalidArgumentException('Unable to finc constructor of '.$reflection->getName());
+
         $properties = array_filter(
-            $reflection->getProperties(ReflectionProperty::IS_PUBLIC),
-            fn (ReflectionProperty $item) => $item->getAttributes($attribute) !== [],
+            $constructor->getParameters(),
+            fn (ReflectionParameter $item) => $item->getAttributes($attribute) !== [],
         );
 
         return array_map(
-            ParameterDefinition::fromReflectionProperty(...),
+            ParameterDefinition::fromReflectionParameter(...),
             $properties,
         );
     }

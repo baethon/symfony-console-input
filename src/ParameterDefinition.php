@@ -5,7 +5,7 @@ namespace Baethon\Symfony\Console\Input;
 use Baethon\Symfony\Console\Input\Attributes\Description;
 use Baethon\Symfony\Console\Input\Attributes\Name;
 use Baethon\Symfony\Console\Input\Attributes\Shortcut;
-use ReflectionProperty;
+use ReflectionParameter;
 use ReflectionType;
 
 final class ParameterDefinition
@@ -22,22 +22,24 @@ final class ParameterDefinition
         //
     }
 
-    public static function fromReflectionProperty(ReflectionProperty $property): ParameterDefinition
+    public static function fromReflectionParameter(ReflectionParameter $parameter): ParameterDefinition
     {
-        $type = $property->getType();
-        $defaultValue = $property->getDefaultValue();
+        $type = $parameter->getType();
+        $defaultValue = $parameter->isOptional()
+            ? $parameter->getDefaultValue()
+            : null;
 
         return new self(
-            name: self::findAttribute($property, Name::class)
-                ?->name ?? $property->getName(),
+            name: self::findAttribute($parameter, Name::class)
+                ?->name ?? $parameter->getName(),
             required: match (true) {
                 ! is_null($defaultValue) => false,
                 $type?->allowsNull() => false,
                 default => true,
             },
-            description: self::findAttribute($property, Description::class)
+            description: self::findAttribute($parameter, Description::class)
                 ?->description,
-            shortcut: self::findAttribute($property, Shortcut::class)
+            shortcut: self::findAttribute($parameter, Shortcut::class)
                 ?->shortcut,
             list: ($type instanceof ReflectionType && $type->getName() === 'array'),
             option: ($type instanceof ReflectionType && $type->getName() === 'bool'),
@@ -51,7 +53,7 @@ final class ParameterDefinition
      * @param  class-string<T>  $attribute
      * @return ?T
      */
-    private static function findAttribute(ReflectionProperty $property, string $attribute)
+    private static function findAttribute(ReflectionParameter $property, string $attribute)
     {
         $attributes = $property->getAttributes($attribute);
 
