@@ -9,6 +9,10 @@ This project provides a streamlined way to define Symfony Console commands using
 - Easily integrates with Symfony's Console component.
 - Provides a `UsesInputData` trait to configure and initialize input data automatically.
 
+## Requirements
+
+- PHP >= 8.4
+
 ## Installation
 
 To install the plugin, use Composer:
